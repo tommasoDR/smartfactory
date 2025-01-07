@@ -19,9 +19,11 @@ export interface Message {
 export interface ChatAssistantProps {
     username: string;
     userId: string;
+    externalRequest: string;
 }
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId}) => {
+
+const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, externalRequest}) => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([{
         id: 0,
@@ -32,6 +34,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId}) => {
     const navigate = useNavigate();
     const [isTyping, setIsTyping] = useState(false);
     const containerRef = useRef<HTMLDivElement | null>(null);
+    var isExternalRequest: boolean = false;
 
     const toggleChat = () => setIsChatOpen((prev) => !prev);
 
@@ -39,21 +42,50 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId}) => {
         navigate(target, {state: {metadata}});
     };
 
-    // Effect to scroll to the bottom when messages change
+    // Effect to scroll to the bottom and open the chat when messages change 
     useEffect(() => {
+        // Scroll to the bottom of the chat container
         if (containerRef.current) {
             containerRef.current.scrollTop = containerRef.current.scrollHeight;
         }
+        // Open chat when a new message is received
+        if (!isChatOpen && messages.length > 1) {
+            setIsChatOpen(true);
+        }
     }, [messages]); // Runs every time `messages` changes
 
+    // Effect to handle external requests
+    useEffect(() => {
+        if(externalRequest.length > 0) {
+            // Set the external request flag and handle the message
+            isExternalRequest = true;
+            handleSendMessage();
+        }
+    }, [externalRequest]);
+
     const handleSendMessage = () => {
-        if (!newMessage.trim()) return;
+
+        console.log("External Request: ", isExternalRequest);
+
+        if (!isExternalRequest && !newMessage.trim()) return;
 
         const userMessage: Message = {
             id: messages.length + 1,
             sender: 'user',
-            content: newMessage,
+            content: '',
         };
+
+        if (isExternalRequest) {
+            // If the message is an external request, use the external request string
+            userMessage.content = externalRequest;
+        }
+        else {
+            // Otherwise, use the new message set by the input field
+            userMessage.content = newMessage;
+        }
+
+        // Clear the external request flag
+        isExternalRequest = false;
 
         setMessages((prev) => [...prev, userMessage]);
 

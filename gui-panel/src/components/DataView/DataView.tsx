@@ -72,7 +72,11 @@ const KpiSelector: React.FC<{
     );
 };
 
-const DataView: React.FC = () => {
+interface DataViewProps {
+    agentRequest: (request: string) => void;
+}
+
+const DataView: React.FC<DataViewProps> = ({agentRequest}) => {
     const dataManager = PersistentDataManager.getInstance();
     const [kpi, setKpi] = useState<KPI>(dataManager.getKpiList()[0]);
     const [timeFrame, setTimeFrame] = useState<TimeFrame>({
@@ -104,6 +108,12 @@ const DataView: React.FC = () => {
         }
     };
 
+    // AI Chat Assistant Chart Explanation
+    const handleExplain = (chart: string, kpi:KPI, data:any[]) => {
+        agentRequest(`Explain ${kpi.name} ${chart}.`);
+    };
+    
+
     return (
         <div className="flex-1 flex-col w-full h-full space-y-5 p-6 items-center">
             {/* KPI Selector and Generate Button */}
@@ -122,11 +132,45 @@ const DataView: React.FC = () => {
 
             {/* Chart Section */}
 
-            {loading ? <p>Loading...</p> :
-                <div className={` shadow-md p-5 bg-white flex w-auto`}>
-                    <Chart data={chartData} graphType={graphType} kpi={kpi} timeUnit={timeFrame.aggregation}/>
+            {loading ? (
+                <p>Loading...</p>
+            ) : (
+                <div className={`shadow-md p-5 bg-white w-auto`} style={{ position: 'relative', width: '100%', height: '500px' }}>
+                    {/* KPI Title and Explain Button */}
+                    <div className="flex justify-between items-center mb-6">
+                        {chartData?.length > 0 && (
+                            <h3 className="text-xl font-semibold text-gray-700 flex-1 text-center">
+                                {kpi?.name}
+                            </h3>
+                        )}
+                        {chartData?.length > 0 && (    
+                                <button
+                                    style={{
+                                        position: 'absolute',
+                                        top: '20px',
+                                        right: '20px',
+                                        zIndex: 10,
+                                    }}
+                                    className="bg-blue-500 text-white px-6 py-2 rounded shadow hover:bg-blue-600 transition"
+                                    onClick={() => handleExplain(graphType, kpi, chartData)}
+                                >
+                                    Explain
+                                </button>
+                        )}
+                    </div>
+
+                    {/* Chart */}
+                    <div className="flex items-center justify-center">
+                        <Chart
+                            data={chartData}
+                            graphType={graphType}
+                            kpi={kpi}
+                            timeUnit={timeFrame.aggregation}
+                        />
+                    </div>
                 </div>
-            }
+            )}
+            
         </div>
     );
 };

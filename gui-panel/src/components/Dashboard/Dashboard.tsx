@@ -1,6 +1,6 @@
 import {useParams} from 'react-router-dom';
-import React, {useEffect, useState} from "react";
-import {DashboardEntry, DashboardLayout} from "../../api/DataStructures";
+import React, {useEffect, useState, useRef} from "react";
+import {DashboardEntry, DashboardLayout, KPI} from "../../api/DataStructures";
 import Chart from "../Chart/Chart";
 import {fetchData} from "../../api/DataFetcher";
 import FilterOptionsV2, {Filter} from "../Selectors/FilterOptions";
@@ -8,7 +8,11 @@ import TimeSelector, {TimeFrame} from "../Selectors/TimeSelect";
 import PersistentDataManager from "../../api/DataManager";
 import {handleTimeAdjustments} from "../../utils/chartUtil";
 
-const Dashboard: React.FC = () => {
+interface DashboardProps {
+    agentRequest: (request: string) => void;
+}
+
+const Dashboard: React.FC<DashboardProps> = ({agentRequest}) => {
         const dataManager = PersistentDataManager.getInstance();
         const {dashboardId, dashboardPath} = useParams<{ dashboardId: string, dashboardPath: string }>();
         const [dashboardData, setDashboardData] = useState<DashboardLayout>(new DashboardLayout("", "", []));
@@ -23,6 +27,11 @@ const Dashboard: React.FC = () => {
             aggregation: 'day'
         });
         const [isRollbackTime, setIsRollbackTime] = useState(false);
+
+        // AI Chat Assistant Chart Explanation
+        const handleExplain = (chart: string, kpi:KPI, data:any[]) => {
+            agentRequest(`Explain ${kpi.name} ${chart}.`);
+        };
 
         //on first data load
         useEffect(() => {
@@ -149,11 +158,21 @@ const Dashboard: React.FC = () => {
                         key={index}
                         className={`bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-shadow ${gridClass}`}
                     >
-                        {/* KPI Title */}
-                        <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">
-                            {kpi?.name}
-                        </h3>
-
+                        {/* KPI Title and Explain Button */}
+                        <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-semibold text-gray-700 text-center">
+                                {kpi?.name}
+                            </h3>
+                            {chartData[index]?.length > 0 && (
+                                <button
+                                    className="bg-blue-500 text-white px-6 py-2 rounded shadow hover:bg-blue-600 transition"
+                                    onClick={() => handleExplain(entry.graph_type, kpi, chartData[index])} 
+                                >
+                                    Explain
+                                </button>
+                            )}
+                        </div>
+                    
                         {/* Chart */}
                         <div className="flex items-center justify-center">
                             <Chart
@@ -163,7 +182,7 @@ const Dashboard: React.FC = () => {
                                 timeUnit={timeFrame.aggregation}
                             />
                         </div>
-                    </div>;
+                    </div>;                
                 })}
             </div>
         </div>;

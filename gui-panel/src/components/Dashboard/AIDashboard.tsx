@@ -1,5 +1,5 @@
 import {useLocation} from "react-router-dom";
-import {DashboardEntry, DashboardFolder, DashboardLayout} from "../../api/DataStructures";
+import {DashboardEntry, DashboardFolder, DashboardLayout, KPI} from "../../api/DataStructures";
 import React, {useEffect, useState} from "react";
 import Chart from "../Chart/Chart";
 import {fetchData} from "../../api/DataFetcher";
@@ -37,7 +37,12 @@ class TemporaryLayout {
 
 }
 
-const AIDashboard: React.FC<{ userId: string }> = ({userId}) => {
+interface AIDashboardProps {
+    userId: string
+    agentRequest: (request: string) => void;
+}
+
+const AIDashboard: React.FC<AIDashboardProps> = ({userId, agentRequest}) => {
     const location = useLocation();
     const metadata = location.state?.metadata;
 
@@ -134,6 +139,11 @@ const AIDashboard: React.FC<{ userId: string }> = ({userId}) => {
             fetchChartData();
         }
     }, [filters, timeFrame, isRollbackTime]);
+
+    // AI Chat Assistant Chart Explanation
+    const handleExplain = (chart: string, kpi:KPI, data:any[]) => {
+        agentRequest(`Explain ${kpi.name} ${chart}.`);
+    };
 
 
     if (loading) {
@@ -263,10 +273,20 @@ const AIDashboard: React.FC<{ userId: string }> = ({userId}) => {
                     key={index}
                     className={`bg-white shadow-lg rounded-xl p-6 border border-gray-200 hover:shadow-xl transition-shadow ${gridClass}`}
                 >
-                    {/* KPI Title */}
-                    <h3 className="text-xl font-semibold text-gray-700 mb-6 text-center">
-                        {kpi?.name}
-                    </h3>
+                    {/* KPI Title and Explain Button */}
+                    <div className="flex justify-between items-center mb-6">
+                            <h3 className="text-xl font-semibold text-gray-700 text-center">
+                                {kpi?.name}
+                            </h3>
+                            {chartData[index]?.length > 0 && (
+                                <button
+                                    className="bg-blue-500 text-white px-6 py-2 rounded shadow hover:bg-blue-600 transition"
+                                    onClick={() => handleExplain(entry.graph_type, kpi, chartData[index])} 
+                                >
+                                    Explain
+                                </button>
+                            )}
+                        </div>
 
                     {/* Chart */}
                     <div className="flex items-center justify-center">

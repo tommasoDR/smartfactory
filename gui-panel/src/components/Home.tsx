@@ -1,4 +1,4 @@
-import React, {useEffect} from 'react';
+import React, {useEffect, useState}  from 'react';
 import {Navigate, Route, Routes, useLocation} from 'react-router-dom';
 import {NotificationProvider, useNotification} from './Notification/Notification';
 import ChatAssistant from './ChatAssistant/ChatAssistant';
@@ -53,6 +53,9 @@ const NotificationBanner: React.FC = () => {
 const SmartFactory: React.FC<UserProps> = ({userId, username, token, role, site, email, userAvatar, onLogout}) => {
     const location = useLocation();
     const {addNotification} = useNotification();
+
+    // Shared string state for dashboard, dataView and chatAssistant
+    const [externalRequest, askAgentExternal] = useState<string>('');
 
     // Simulazione di un nuovo log
     const handleNewLog = () => {
@@ -118,11 +121,11 @@ const SmartFactory: React.FC<UserProps> = ({userId, username, token, role, site,
                     <Routes>
                         <Route path="/" element={<Navigate to="dashboards/overview" replace/>}/>
                         <Route path="home" element={<Home username={username} token={token} role={role} site={site} />}/>
-                        <Route path="dashboards/:dashboardId" element={<Dashboard/>}/>
-                        <Route path="dashboards/:dashboardPath/:dashboardId" element={<Dashboard/>}/>
-                        <Route path="dashboards/new" element={<AIDashboard userId={userId} /> } />
+                        <Route path="dashboards/:dashboardId" element={<Dashboard agentRequest={askAgentExternal}/>}/>
+                        <Route path="dashboards/:dashboardPath/:dashboardId" element={<Dashboard agentRequest={askAgentExternal}/>}/>
+                        <Route path="dashboards/new" element={<AIDashboard userId={userId} agentRequest={askAgentExternal}/> } />
                         <Route path="user-settings" element={<UserSettings userId={userId} username={username} token={token} role={role} site={site} email={email}/>}/>
-                        <Route path="data-view" element={<DataView/>}/>
+                        <Route path="data-view" element={<DataView agentRequest={askAgentExternal}/>}/>
                         <Route path="log" element={<LogPage/>}/>
                         <Route path="kpis" element={<KpiViewer/>}/>
                         <Route path="forecasts" element={<Forecasting/>}/>
@@ -135,7 +138,7 @@ const SmartFactory: React.FC<UserProps> = ({userId, username, token, role, site,
             </main>
 
             {/* Chat Assistant */}
-            <ChatAssistant username={username} userId={userId} />
+            <ChatAssistant username={username} userId={userId} externalRequest={externalRequest}/>
         </div>
     );
 };
