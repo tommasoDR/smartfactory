@@ -1,6 +1,6 @@
 import httpx
 import json
-import os
+import os, sys
 import time
 import nltk
 
@@ -371,8 +371,50 @@ async def handle_kb_q(question: Question, llm, graph, history):
     response = general_qa.chain.invoke(question.userInput)
     return response['result']
 
-async def handle_explain_chart(question: Question):
-    return Answer(textResponse="Received chart explain request.", textExplanation="", data="", label="explainChart")
+def handle_explain_chart(question: Question):
+    """
+    Handles the request to explain a chart invoked by the GUI.
+    
+    Args:
+        question (Question): The question object containing the data needed to answer.
+        
+    Returns:
+        Answer: An Answer object containing the response to the explain chart request.
+    """
+    try:
+        # Read the request content
+        request = json.loads(question.userInput)
+
+        # Read the chart information file
+        chart_info = {}
+        with open(os.path.join("docs","gui_elements.json"), "r") as f:
+            chart_info = json.load(f)
+
+        # Retrieve the description for the considered chart ID
+        chart_description = ''
+        for chart in chart_info["charts"]:
+            if chart["ID"] == request['chart']:
+                chart_description = chart["description"]
+
+        # Read and format the prompt
+        prompt = prompt_manager.get_prompt('explain_chart').format(
+            kpi_name = request['kpi_name'],
+            kpi_description = request['kpi_description'],
+            kpi_unit = request['kpi_unit'],
+            chart_type = request['chart'],
+            chart_description = chart_description,
+            chart_data = request['data']
+        )
+
+        # Invoke the model with the prompt
+        response = llm.invoke(prompt)
+
+        # Return the response as an Answer object
+        return Answer(textResponse=response.content, textExplanation='', data='', label="explainChart")
+    
+    except Exception as e:
+        print(e)
+        return Answer(textResponse="Something gone wrong, I'm not able to explain the chart", textExplanation="", data="", label="Error")
 
 async def translate_answer(question: Question, question_language: str, context):
     """
@@ -610,4 +652,5 @@ async def ask_question(question: Question): # to add or modify the services allo
                 data = json.dumps(response_json["bindings"], indent=2)
                 return Answer(textResponse=textResponse, textExplanation=textExplanation, data=data, label=label)
     except Exception as e:
+        print(e)
         return Answer(textResponse="Something gone wrong, I'm not able to answer your question", textExplanation="", data="", label="Error")

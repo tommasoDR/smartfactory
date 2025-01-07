@@ -23,6 +23,13 @@ export interface ChatAssistantProps {
     externalRequest: string;
 }
 
+const handleText = (text: string) => {
+    // Replace newline characters with <br> tags
+    text = text.replace(/\n/g, '<br>');
+    // replace **test** with <strong>test</strong> tags
+    text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+    return text;
+};
 
 const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetRequest, externalRequest}) => {
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -145,6 +152,8 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
                                 explanation: explanation,
                             };
                             break;
+                        case 'explainChart':
+                            response.textResponse = handleText(response.textResponse);
                         default:
                             extraData = {
                                 explanation: explanation,
