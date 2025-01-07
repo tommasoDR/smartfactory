@@ -371,6 +371,9 @@ async def handle_kb_q(question: Question, llm, graph, history):
     response = general_qa.chain.invoke(question.userInput)
     return response['result']
 
+async def handle_explain_chart(question: Question):
+    return Answer(textResponse="Received chart explain request.", textExplanation="", data="", label="explainChart")
+
 async def translate_answer(question: Question, question_language: str, context):
     """
     Translates the generated response into the user's preferred language.
@@ -399,12 +402,20 @@ async def translate_answer(question: Question, question_language: str, context):
 #async def ask_question(question: Question, api_key: str = Depends(get_verify_api_key(["api-layer"]))): # to add or modify the services allowed to access the API, add or remove them from the list in the get_verify_api_key function e.g. get_verify_api_key(["gui", "service1", "service2"])
 async def ask_question(question: Question): # to add or modify the services allowed to access the API, add or remove them from the list in the get_verify_api_key function e.g. get_verify_api_key(["gui", "service1", "service2"])    
     try:
+        # Initialize the explainer
         explainer = RagExplainer(threshold = 15.0,)
+
         # Extract the user ID
         userId = question.userId
 
+        # Extract the request type
+        requestType = question.requestType
+
         if userId not in history:
             history[userId] = deque(maxlen=HISTORY_LEN)
+
+        if requestType == "explainChart":
+            return handle_explain_chart(question)
 
         # Translate the question to English
         language_prompt = prompt_manager.get_prompt('get_language').format(

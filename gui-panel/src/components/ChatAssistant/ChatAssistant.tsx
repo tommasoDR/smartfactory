@@ -19,11 +19,12 @@ export interface Message {
 export interface ChatAssistantProps {
     username: string;
     userId: string;
+    resetRequest: (request: string) => void;
     externalRequest: string;
 }
 
 
-const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, externalRequest}) => {
+const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetRequest, externalRequest}) => {
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([{
         id: 0,
@@ -56,7 +57,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, external
 
     // Effect to handle external requests
     useEffect(() => {
-        if(externalRequest.length > 0) {
+        if(externalRequest.length > 0 && externalRequest !== 'STOP') {
             // Set the external request flag and handle the message
             isExternalRequest = true;
             handleSendMessage();
@@ -65,33 +66,47 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, external
 
     const handleSendMessage = () => {
 
-        console.log("External Request: ", isExternalRequest);
-
         if (!isExternalRequest && !newMessage.trim()) return;
 
+        // Initialize a new user message and request type
         const userMessage: Message = {
             id: messages.length + 1,
             sender: 'user',
             content: '',
         };
+        let requestType = '';
 
+        // Handle external requests
         if (isExternalRequest) {
-            // If the message is an external request, use the external request string
-            userMessage.content = externalRequest;
+            let request = JSON.parse(externalRequest);
+            if(request.type === 'explainChart') {
+                // Placeholder message for chart explanation in chat
+                let gui_message: Message = {
+                    id: messages.length + 1,
+                    sender: 'user',
+                    content: `Explain ${request.kpi_name} chart.`,
+                }
+                setMessages((prev) => [...prev, gui_message]);
+                // Put the external request in the user message
+                userMessage.content = externalRequest;
+                // Define requestType
+                requestType = 'explainChart';
+            }
         }
+        // Handle normal messages from the user
         else {
-            // Otherwise, use the new message set by the input field
+            // Disable external request
+            resetRequest('STOP');
+            // Use the new message set by the input field
             userMessage.content = newMessage;
+            setMessages((prev) => [...prev, userMessage]);
+            // Define requestType
+            requestType = 'chat';
         }
-
-        // Clear the external request flag
-        isExternalRequest = false;
-
-        setMessages((prev) => [...prev, userMessage]);
 
         //if the message is a command, handle it
         setIsTyping(true);
-        interactWithAgent(userId, userMessage.content)
+        interactWithAgent(userId, userMessage.content, requestType)
             .then((response) => {
                 let extraData = {};
                 console.log(response);
@@ -144,6 +159,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, external
                     extraData: extraData,
                 };
                 setMessages((prev) => [...prev, assistantMessage]);
+
             })
             .catch(() => {
                 setMessages((prev) => [
@@ -155,7 +171,9 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, external
                     },
                 ]);
             }).finally(() => {
-            setIsTyping(false); // Unlock input
+                isExternalRequest = false;  // Clear the external request flag
+                resetRequest('');  // Reset the external request string
+                setIsTyping(false); // Unlock input
         });
         setTimeout(() => {
             if (isTyping) {

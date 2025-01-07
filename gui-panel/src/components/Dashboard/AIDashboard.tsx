@@ -40,9 +40,10 @@ class TemporaryLayout {
 interface AIDashboardProps {
     userId: string
     agentRequest: (request: string) => void;
+    currentRequest: string;
 }
 
-const AIDashboard: React.FC<AIDashboardProps> = ({userId, agentRequest}) => {
+const AIDashboard: React.FC<AIDashboardProps> = ({userId, agentRequest, currentRequest}) => {
     const location = useLocation();
     const metadata = location.state?.metadata;
 
@@ -142,7 +143,20 @@ const AIDashboard: React.FC<AIDashboardProps> = ({userId, agentRequest}) => {
 
     // AI Chat Assistant Chart Explanation
     const handleExplain = (chart: string, kpi:KPI, data:any[]) => {
-        agentRequest(`Explain ${kpi.name} ${chart}.`);
+        let request: {[key: string]: string} = {};
+        // Request type is explainChart
+        request["type"] = "explainChart";
+        // Add KPI details
+        request["kpi_id"] = kpi.id;
+        request["kpi_name"] = kpi.name;
+        request["kpi_description"] = kpi.description;
+        request["kpi_unit"] = kpi.unit;
+        // Add chart details
+        request["chart"] = chart;
+        // Add data
+        request["data"] = JSON.stringify(data);
+        // Send request to AI in JSON format
+        agentRequest(JSON.stringify(request));
     };
 
 
@@ -280,8 +294,13 @@ const AIDashboard: React.FC<AIDashboardProps> = ({userId, agentRequest}) => {
                             </h3>
                             {chartData[index]?.length > 0 && (
                                 <button
-                                    className="bg-blue-500 text-white px-6 py-2 rounded shadow hover:bg-blue-600 transition"
-                                    onClick={() => handleExplain(entry.graph_type, kpi, chartData[index])} 
+                                    className={`px-6 py-2 rounded shadow transition ${
+                                        currentRequest != '' 
+                                            ? 'bg-gray-200 text-gray-600 cursor-not-allowed' 
+                                            : 'bg-blue-500 hover:bg-blue-600 text-white'
+                                    }`}
+                                    onClick={() => handleExplain(entry.graph_type, kpi as KPI, chartData[index])}
+                                    disabled={currentRequest != ''} // Disable the button when there is a current request
                                 >
                                     Explain
                                 </button>

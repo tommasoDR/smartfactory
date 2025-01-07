@@ -11,6 +11,7 @@ class Question(BaseModel):
     """
     userInput: str
     userId: str
+    requestType: str
 
 
 class Answer(BaseModel):

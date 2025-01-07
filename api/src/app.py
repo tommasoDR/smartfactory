@@ -26,7 +26,7 @@ from database.connection import get_db_connection, query_db_with_params, close_c
 from database.druid_connection import execute_druid_query
 from database.minio_connection import *
 # TODO: how to import modules from rag directory ??
-from model.agent import Answer, Question
+from model.agent import Answer, Question, AgentRequest
 from model.alert import Alert
 from model.historical import HistoricalQueryParams
 from model.kpi import Kpi
@@ -504,7 +504,8 @@ def call_ai_agent(input: Question):
     }
     body = {
         'userInput': input.userInput,
-        'userId': input.userId
+        'userId': input.userId,
+        'requestType': input.requestType
     }
     print(f"sending request to RAG API: {body}")
     response = requests.post(os.getenv('RAG_API_ENDPOINT'), headers=headers, json=body)
@@ -635,7 +636,7 @@ def generate_report(userId: Annotated[str, Body()], params: Annotated[Union[Repo
             kpi=",".join(params.kpis),
             machines=",".join(params.machines)
         )
-        question = Question(userInput=filled_prompt, userId=userId)
+        question = Question(userInput=filled_prompt, userId=userId, requestType="scheduledReport")
         ai_response = call_ai_agent(question).json()
         logging.info(ai_response)
         answer = Answer.model_validate(ai_response)
@@ -884,7 +885,7 @@ def calculate_kpi(request: List[KpiRequest], _: str = Depends(get_verify_api_key
 
 
 @app.post("/smartfactory/agent/{userId}", response_model=Answer)
-def ai_agent_interaction(userInput: Annotated[str, Body(embed=True)], userId: str,
+def ai_agent_interaction(userId: str, agent_request: AgentRequest,
                          api_key: str = Depends(get_verify_api_key(["gui"]))):
     """
     Endpoint to interact with the AI agent.
@@ -897,13 +898,17 @@ def ai_agent_interaction(userInput: Annotated[str, Body(embed=True)], userId: st
     Raises:
         HTTPException: If the input is empty or an unexpected error occurs.
     """
+    # Extract the user input and request type from the request
+    userInput = agent_request.userInput
+    requestType = agent_request.requestType
+
     if not userInput:
         logging.error("Empty input")
         raise HTTPException(status_code=500, detail="Empty user input")
     try:
         # Send the user input to the RAG API and get the response
         # build the Question object
-        question = Question(userInput=userInput, userId=userId)
+        question = Question(userInput=userInput, userId=userId, requestType=requestType)
         response = call_ai_agent(question)
         answer = response.json()
         if answer["label"] == 'new_kpi':

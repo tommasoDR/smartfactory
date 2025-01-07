@@ -457,9 +457,10 @@ export const getAlerts = async (userId: string): Promise<Alert[]> => {
  * API POST used to take the response of the AI
  * @param userId string - The user ID
  * @param userInput string - The user input
+ * @param requestType string - The request type
  * @returns Promise will return the AI response
  */
-export const interactWithAgent = async (userId: string, userInput: string): Promise<{
+export const interactWithAgent = async (userId: string, userInput: string, requestType: string): Promise<{
     textResponse: string;
     textExplanation: string,
     data?: string,
@@ -468,7 +469,10 @@ export const interactWithAgent = async (userId: string, userInput: string): Prom
     try {
         const response = await axios.post(
             `${BASE_URL}/smartfactory/agent/${userId}`,
-            {userInput},
+            {
+                userInput, 
+                requestType
+            },
             {
                 headers: {
                     "Content-Type": "application/json",
