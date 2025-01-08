@@ -25,4 +25,4 @@ Output content:
    - Highlight significant values, anomalies, or changes over time (if applicable).  
    - Suggest what these insights might mean for the audience or decision-makers (if reasonable).
 
-Output format instruction: Output plain text, going on next line by inserting two newline characters when necessary.
+Output format instruction: Output plain text, going on next line by inserting a newline character when necessary. If you use bullet points to organize information, starting each point with the character '-' followed by a space before the phrase. Highlight titles and machine names by embedding them in double asterisks (e.g., **General Explanation:**)

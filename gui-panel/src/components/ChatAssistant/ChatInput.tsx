@@ -16,7 +16,7 @@ const ChatInput: React.FC<ChatInputProps> = ({newMessage, setNewMessage, handleS
     };
 
     return (
-        <div className="chat-input flex items-center p-2 border-t w-full">
+        <div className="chat-input flex items-center p-2 w-full">
     <textarea
         className="input-field flex-grow border border-gray-300 rounded-lg px-3 py-2 text-sm font-normal outline-none focus:ring-2 focus:ring-blue-500 resize-none w-full overflow-hidden"
         value={newMessage}
@@ -36,7 +36,7 @@ const ChatInput: React.FC<ChatInputProps> = ({newMessage, setNewMessage, handleS
             {/* Send button with icon */}
             {newMessage.trim().length > 0 && !isTyping && (
                 <button
-                    className="send-button ml-2 bg-blue-400 text-white px-2.5 py-2 rounded-lg text-sm hover:bg-blue-700 transition-colors"
+                    className="send-button ml-2 bg-blue-400 text-white px-2.5 py-1.5 rounded-lg text-sm hover:bg-blue-700 transition-colors"
                     onClick={() => {
                         if (newMessage.trim() === '') return;
                         handleSendMessage(newMessage);

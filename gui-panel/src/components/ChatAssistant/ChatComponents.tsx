@@ -52,10 +52,13 @@ const MessageBubble: React.FC<MessageProps> = ({message, onNavigate}) => {
                     : 'bg-gray-200'
             )}
         >
+
             <div className="text-xs text-gray-600 font-semibold">
                 {message.sender === 'user' ? 'You' : 'Assistant'}
             </div>
-            <p className="text-gray-800 text-sm text-wrap break-words font-[450] ">{message.content}</p>
+            
+            <div className="text-gray-800 text-sm text-wrap break-words font-[450] " dangerouslySetInnerHTML={{ __html: message.content }} />
+            
             {message.extraData && <ExtraDataButtons extraData={message.extraData} onNavigate={onNavigate}/>}
         </div>
     );
