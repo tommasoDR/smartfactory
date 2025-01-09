@@ -167,14 +167,25 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
         const initialHeight = size.height;
         const initialX = e.clientX;
         const initialY = e.clientY;
+        const viewportWidth = window.innerWidth;
+        const viewportHeight = window.innerHeight;
+
+        // Get the chat's current position
+        const currentX = position.x;
+        const currentY = position.y;
+
+        // Calculate the maximum allowed dimensions
+        const maxWidth = viewportWidth - currentX - 15; // padding
+        const maxHeight = viewportHeight - currentY;
 
         const handleMouseMove = (moveEvent: MouseEvent) => {
-        if (isResizing) {
-            const newWidth = Math.max(200, initialWidth + (moveEvent.clientX - initialX));
-            const newHeight = Math.max(200, initialHeight + (moveEvent.clientY - initialY));
+            if (isResizing) {
+                // Constrain the new dimensions
+                const newWidth = Math.min(Math.max(280, initialWidth + (moveEvent.clientX - initialX)), maxWidth);
+                const newHeight = Math.min(Math.max(300, initialHeight + (moveEvent.clientY - initialY)), maxHeight);
 
-            setSize({ width: newWidth, height: newHeight });
-        }
+                setSize({ width: newWidth, height: newHeight });
+            }
         };
 
         const handleMouseUp = () => {
@@ -356,7 +367,8 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
                     bottom: 0,
                     width: '16px',
                     height: '16px',
-                    backgroundColor: 'gray',
+                    backgroundImage: `url(${require('./icons/resize.svg').default})`,
+                    backgroundSize: 'cover',
                     cursor: 'se-resize',
                     }}
                 />
