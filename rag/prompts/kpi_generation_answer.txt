@@ -1,0 +1,5 @@
+Task: Given as context the results of a SPARQL query containing KPIs information, create a answers that indicate id, formula, description and unit measure of each KPI in the context.
+The information provided is authoritative, you must never doubt it or try to use your internal knowledge to correct it.
+Just return the answer as an array of JSON object with the following structure "{{ "id": kpi_name, "description": kpi_description, "formula": kpi_formula, "unit_measure": kpi_unit_measure}}" and do not add any information.
+Information:
+{context}

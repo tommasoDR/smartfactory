@@ -1,0 +1,121 @@
+{history_context}
+
+Task: Generate a SPARQL SELECT statement for querying a graph database.
+
+For instance, to find all information about working time avg KPI, the following query in backticks would be suitable:
+```PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+PREFIX owl: <http://www.w3.org/2002/07/owl#>
+PREFIX sa-ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
+
+SELECT ?description ?formula ?unit_measure ?atomic
+WHERE {{
+?kpi sa-ontology:id "working_time_avg" . 
+?kpi sa-ontology:description ?description . 
+?kpi sa-ontology:formula ?formula .
+?kpi sa-ontology:unit_measure ?unit_measure . 
+?kpi sa-ontology:atomic ?atomic .
+}}```. 
+As a second example, to count the number of machines of any type, the following query in backticks would be suitable:
+```PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX sa-ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
+
+SELECT (COUNT(?machine) AS ?count)
+WHERE {{
+  {{?machine rdf:type sa-ontology:AssemblyMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:LargeCapacityCuttingMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:LaserCutter .}}
+  UNION
+  {{?machine rdf:type sa-ontology:LaserWeldingMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:LowCapacityCuttingMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:MediumCapacityCuttingMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:RivetingMachine .}}
+  UNION
+  {{?machine rdf:type sa-ontology:TestingMachine .}}
+}}```
+
+Instructions:
+Use only the node types and properties provided in the schema.
+Do not use any node types and properties that are not explicitly provided.
+Include all necessary prefixes.
+
+Schema:
+{schema}
+
+Note: 
+Be as concise as possible.
+
+When naming a KPI, ensure the following format:
+1. The KPI name must match the one found in <owl:NamedIndividual ...>, such as rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#offline_time_avg" for the KPI ID offline_time_avg.
+2. Use lowercase letters for the first letter of each word.
+3. Connect words using underscores (_).
+4. Do not include spaces or special characters.
+Example Format:
+- Correct: offline_time_avg
+- Incorrect: OfflineTimeAvg, offline time avg, or OFFLINE_TIME_AVG.
+Always follow this convention when naming KPIs.
+
+When generating a machine ID, ensure the following format:
+1. Use uppercase letters for the first letter of each word in the machine name.
+2. Separate each word with a single space.
+3. Include the number as a separate substring at the end, if applicable.
+Example Format:
+- Correct: Assembly Machine 2
+- Incorrect: assemblymachine2, AssemblyMachine2, or assembly machine 2.
+Always follow this convention when generating machine IDs.
+
+When naming a formula, ensure the following format:
+1. Use the KPI IDs in lowercase, connected by underscores (_).
+2. Use operators (e.g., /, +, -, *) between KPI IDs.
+3. Do not include spaces or special characters, except for the mathematical operators.
+Example Format:
+- Correct: working_time_sum/operative_time
+- Incorrect: WorkingTimeSum/OperativeTime, working_time_sum + operative_time, or working_time_sum operative_time.
+Always follow this convention when naming formulas.
+
+Do not include any explanations or apologies in your responses.
+Do not respond to any questions that ask for anything else than for you to construct a SPARQL query.
+Do not include any text except the SPARQL query generated.
+For the query use only the format SELECT ... WHERE{{...}}.
+Generate only a single query.
+Do not use FILTER or BIND.
+
+If you use the UNION the format of the WHERE clause must be WHERE {{
+     {{
+       ...
+     }} UNION {{
+       ...
+     }}
+   }}
+
+Examples of correct and incorrect formats:
+Correct:
+WHERE {{
+  {{
+    ... .
+  }} UNION {{
+    ...
+  }}
+}}
+
+Incorrect:
+WHERE {{
+  ... .
+}}
+UNION {{
+  ...
+}}
+If UNION is outside WHERE, it is invalid, do not generate such queries. This is valid also for KPIs.
+
+To correctly match boolean values in SPARQL, use typed literals with the xsd:boolean datatype: "true"^^xsd:boolean 
+ "false"^^xsd:boolean.
+When the user request do not contain an explicit subject, search in the conversation history to find what the user is referring to.
+If the user request generally talks about machines consider all the rdf:type associated with machines. If the user request generally talks about KPI consider all the rdf:type associated with KPIs 
+
+The question is:
+{prompt}

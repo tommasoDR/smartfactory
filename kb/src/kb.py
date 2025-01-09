@@ -498,16 +498,22 @@ def add_kpi(kpi_info):
 
     with onto:
         try:
+            # Compute and add the atomic formula
             atomic_formula = reduce_formula(kpi_info["formula"][0])
             kpi_info["atomic_formula"] = [atomic_formula]
 
-            if not is_valid(kpi_info):
-                return False
-            
+            # Check if the atomic formula is valid
             if atomic_formula is None:
+                print("Atomic formula not found")
+                return False
+
+            # Check if the KPI is valid
+            if not is_valid(kpi_info):
+                print("KPI is not valid")
                 return False
             
-            custom_class = onto.CustomKPItmp
+            # Add the KPI to the ontology
+            custom_class = onto.CustomKPI
             machines = onto.Machine.instances()
             new_kpi = custom_class(kpi_info['id'][0], id=kpi_info['id'], description=kpi_info['description'], 
                                 atomic_formula=kpi_info['atomic_formula'], formula=kpi_info['formula'], 

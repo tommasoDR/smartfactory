@@ -10,7 +10,7 @@ Class: KPI
   Class: EnergyKPI
     Class: Consumption
     Class: EnergyCost
-  Class: CustomKPItmp
+  Class: CustomKPI
   Class: EnvironmentalKPI
   Class: MachineUsageKPI
   Class: MaintenanceKPI
@@ -59,7 +59,7 @@ Class: EnergyKPI
   Class: Consumption
   Class: EnergyCost
 Class: EnergyCost
-Class: CustomKPItmp
+Class: CustomKPI
 Class: Cut
 Class: EnvironmentalKPI
 Class: LargeCapacityCuttingMachine

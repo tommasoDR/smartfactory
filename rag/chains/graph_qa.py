@@ -25,6 +25,9 @@ from langchain_community.graphs.rdf_graph import RdfGraph
 import warnings
 warnings.filterwarnings("ignore")
 
+prefixes = ["PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>","PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>",
+"PREFIX owl: <http://www.w3.org/2002/07/owl#>","PREFIX sa-ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>"]
+
 def trim_query(query: str) -> str:
     """
     Trims a SPARQL query to remove unnecessary parts and returns only the essential query components.
@@ -43,6 +46,26 @@ def trim_query(query: str) -> str:
         return match.group(1) + match.group(2)  # Return everything before WHERE and the WHERE clause content
     
     return query  # If no WHERE clause is found, return the original query
+
+def add_prefixes(query: str) -> str:
+    """
+    Adds the necessary prefixes to a SPARQL query if not already present.
+
+    Args:
+        query (str): The SPARQL query string.
+    
+    Returns:
+        str: The SPARQL query string with the necessary prefixes added.
+    """
+    # Extract the existing prefixes from the query
+    existing_prefixes = re.findall(r"PREFIX\s+\w+:\s+<[^>]+>", query)
+
+    # Add the missing prefixes to the query
+    for prefix in prefixes:
+        if prefix not in existing_prefixes:
+            query = prefix + "\n" + query
+    
+    return query
 
 class GraphSparqlQAChain(Chain):
     """
@@ -195,6 +218,7 @@ class GraphSparqlQAChain(Chain):
         generated_sparql = generated_sparql.replace("`", "").replace("sparql", "").strip()
         generated_sparql = "\n".join(generated_sparql.split("\n")[0:])
         generated_sparql = trim_query(generated_sparql)
+        generated_sparql = add_prefixes(generated_sparql)
 
         _run_manager.on_text("Generated SPARQL:", end="\n", verbose=self.verbose)
         _run_manager.on_text(

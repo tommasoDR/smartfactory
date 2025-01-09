@@ -162,8 +162,7 @@ const DataView: React.FC<DataViewProps> = ({agentRequest, currentRequest}) => {
                                     style={{
                                         position: 'absolute',
                                         top: '20px',
-                                        right: '20px',
-                                        zIndex: 10,
+                                        right: '20px'
                                     }}
                                     className={`px-6 py-2 rounded shadow transition ${
                                         currentRequest != '' 

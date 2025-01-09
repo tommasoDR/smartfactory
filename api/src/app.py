@@ -835,15 +835,13 @@ def insert_kpi(kpi: Kpi, _: str = Depends(get_verify_api_key(["gui"]))):
         'Content-Type': 'application/json',
         'x-api-key': api_key
     }
+
     logging.info("Inserting KPI: %s", kpi)
 
-    # kpi is already a dict when it comes from the RAG
-    
-    # kpi = kpi.dict()
+    # Convert from string to dict
+    kpi = json.loads(kpi)
 
-    # kpi = json.dumps(kpi)
-
-    response = requests.post(url, data=kpi, headers=headers)
+    response = requests.post(url, json=kpi, headers=headers)
     response_data = response.json()
     if response_data['Status'] == 0:
         return JSONResponse(content=kpi["id"], status_code=200)
@@ -911,10 +909,10 @@ def ai_agent_interaction(userId: str, agent_request: AgentRequest,
         question = Question(userInput=userInput, userId=userId, requestType=requestType)
         response = call_ai_agent(question)
         answer = response.json()
+        
         if answer["label"] == 'new_kpi':
             # add new kpi
             try:
-                logging.info("Inserting new KPI: %s", answer["data"])
                 insert_kpi(answer["data"], os.getenv("API_KEY"))
             except Exception as e:
                 logging.error("Exception: %s", str(e))

@@ -202,9 +202,9 @@
     
 
 
-    <!-- http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPItmp -->
+    <!-- http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPI -->
 
-    <owl:Class rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPItmp">
+    <owl:Class rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPI">
         <rdfs:subClassOf rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#KPI"/>
     </owl:Class>
     
@@ -4949,7 +4949,7 @@
     <rdf:Description>
         <rdf:type rdf:resource="http://www.w3.org/2002/07/owl#AllDisjointClasses"/>
         <owl:members rdf:parseType="Collection">
-            <rdf:Description rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPItmp"/>
+            <rdf:Description rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPI"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#EnergyKPI"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#EnvironmentalKPI"/>
             <rdf:Description rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#MachineUsageKPI"/>

@@ -38,6 +38,8 @@ class PromptManager:
             "dashboard": "dashboard_generation",
             "translate": "translate",
             "get_language": "get_language",
+            "qa_select": "qa_select",
+            "qa_answer": "qa_answer",
             "explain_chart": "explain_chart"
         }
 
@@ -72,6 +74,32 @@ class PromptManager:
             prompt = self.prompts[task_name]
         except KeyError:
             raise ValueError(f"No prompt found for task: {task_name}")
+
+        prompt = self.convert_string_to_prompt_template(prompt)
+        return prompt
+    
+    def get_partial_init_prompt(self, label, **kwargs):
+        """
+        Retrieves the prompt for a specific task based on the label with partial initialization.
+
+        Args:
+            label (str): The classification label for the task.
+
+        Returns:
+            PromptTemplate: The prompt template for the specified task.
+
+        Raises:
+            ValueError: If no prompt is found for the given label.
+        """
+        task_name = self.label_to_task_name(label)
+        try:
+            prompt = self.prompts[task_name]
+        except KeyError:
+            raise ValueError(f"No prompt found for task: {task_name}")
+        
+        # Initialize the prompt with the input variables
+        for key, value in kwargs.items():
+            prompt = prompt.replace(f"{{{key}}}", value)
 
         prompt = self.convert_string_to_prompt_template(prompt)
         return prompt

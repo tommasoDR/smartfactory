@@ -120,7 +120,7 @@ class QueryGenerator:
         PREFIX ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
         SELECT ?id WHERE {
         ?kpi rdf:type ?type.
-        FILTER (?type IN (ontology:ProductionKPI_Production, ontology:EnergyKPI_Consumption, ontology:EnergyKPI_Cost, ontology:MachineUsageKPI, ontology:ProductionKPI_Quality, ontology:CustomKPItmp)).
+        FILTER (?type IN (ontology:ProductionKPI_Production, ontology:EnergyKPI_Consumption, ontology:EnergyKPI_Cost, ontology:MachineUsageKPI, ontology:ProductionKPI_Quality, ontology:CustomKPI)).
         ?kpi ontology:id ?id .
         }
         """
