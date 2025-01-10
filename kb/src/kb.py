@@ -478,64 +478,6 @@ def reduce_formula(formula):
     return str(formula)
 
 
-def add_kpi_2(kpi_info):
-    """
-    Add a KPI to the ontology.
-
-    This function modifies the global ontology state by adding a new KPI (Key Performance Indicator) 
-    to the relevant entities.
-
-    Args:
-        kpi_info (dict): The information of the KPI to add.
-
-    Globals:
-        onto (Ontology): The global ontology object is modified to include the new KPI.
-
-    Returns:
-        bool: True if the KPI was successfully added, False otherwise.
-
-    Raises:
-        ValueError: If the Hermit reasoner finds problems with the KPI.
-    """
-
-    with onto:
-        try:
-            # Compute and add the atomic formula
-            atomic_formula = reduce_formula(kpi_info["formula"][0])
-            kpi_info["atomic_formula"] = [atomic_formula]
-
-            # Check if the atomic formula is valid
-            if atomic_formula is None:
-                print("Atomic formula not found")
-                return False
-            
-            print(kpi_info)
-
-            # Check if the KPI is valid
-            if not is_valid(kpi_info):
-                print("KPI is not valid")
-                return False
-
-            # Add the KPI to the ontology
-            custom_class = onto.CustomKPI
-            machines = onto.Machine.instances()
-            new_kpi = custom_class(kpi_info['id'][0], id=kpi_info['id'], description=kpi_info['description'], 
-                                atomic_formula=kpi_info['atomic_formula'], formula=kpi_info['formula'], 
-                                unit_measure=kpi_info['unit_measure'], forecastable=kpi_info['forecastable'], atomic=kpi_info['atomic'], isProducedBy=machines)
-            
-            for machine in onto.Machine.instances():  # Iterates over all instances of 'Machine'
-                # Here you might want to apply a condition to select which machines should produce this KPI
-                machine.producesKPI.append(new_kpi)
-
-            sync_reasoner()
-            onto.save(file = ONTOLOGY_PATH, format = "rdfxml")
-        except Exception as error:
-            print(error)
-            return False
-        
-        return True
-
-
 def add_kpi(kpi_info):
     """
     Add a KPI to the ontology.
