@@ -401,7 +401,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
             {isChatOpen && (
                 <div
                     ref={chatRef}
-                    className="bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col"
+                    className="bg-white rounded-lg shadow-xl border border-gray-200 flex flex-col z-50"
                     style={{
                         position: 'fixed',
                         top: position.y,

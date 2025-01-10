@@ -478,7 +478,7 @@ def reduce_formula(formula):
     return str(formula)
 
 
-def add_kpi(kpi_info):
+def add_kpi_2(kpi_info):
     """
     Add a KPI to the ontology.
 
@@ -515,7 +515,7 @@ def add_kpi(kpi_info):
             if not is_valid(kpi_info):
                 print("KPI is not valid")
                 return False
-            
+
             # Add the KPI to the ontology
             custom_class = onto.CustomKPI
             machines = onto.Machine.instances()
@@ -536,6 +536,68 @@ def add_kpi(kpi_info):
         return True
 
 
+def add_kpi(kpi_info):
+    """
+    Add a KPI to the ontology.
+
+    This function modifies the global ontology state by adding a new KPI (Key Performance Indicator) 
+    to the relevant entities.
+
+    Args:
+        kpi_info (dict): The information of the KPI to add.
+
+    Globals:
+        onto (Ontology): The global ontology object is modified to include the new KPI.
+
+    Returns:
+        bool: True if the KPI was successfully added, False otherwise.
+
+    Raises:
+        ValueError: If the Hermit reasoner finds problems with the KPI.
+    """
+    
+    try:
+    
+        # Compute and add the atomic formula
+        atomic_formula = reduce_formula(kpi_info["formula"][0])
+        kpi_info["atomic_formula"] = [atomic_formula]
+        # Check if the atomic formula is valid
+        if atomic_formula is None:
+            print("Atomic formula not found")
+            return False
+        
+        print(kpi_info)
+        # Check if the KPI is valid
+        if not is_valid(kpi_info):
+            print("KPI is not valid")
+            return False
+                
+        # Read the kpi template 
+        with open("./Ontology/kpi_add_template.txt", "r") as f:
+            kpi_template = f.read()
+        # Format the kpi template
+        kpi_template = kpi_template.format(kpi_id=kpi_info["id"][0], kpi_description=kpi_info["description"][0], kpi_unit_measure=kpi_info["unit_measure"][0], kpi_formula=kpi_info["formula"][0], kpi_atomic_formula=kpi_info["atomic_formula"][0], kpi_atomic=kpi_info["atomic"][0], kpi_forecastable=kpi_info["forecastable"][0])
+        
+        # Read the current ontology file
+        with open(ONTOLOGY_PATH, "r") as f:
+            ontology_content = f.read()
+        # Find the position of the closing rdf:RDF tag
+        closing_tag_position = ontology_content.rfind("</rdf:RDF>")
+        if closing_tag_position == -1:
+            raise ValueError("Closing tag </rdf:RDF> not found in the ontology file.")
+        # Insert the KPI template before the closing rdf:RDF tag
+        updated_ontology_content = ontology_content[:closing_tag_position] + "\n\n" + kpi_template + "\n" + ontology_content[closing_tag_position:]
+        # Write the updated content back to the ontology file
+        with open(ONTOLOGY_PATH, "w") as f:
+            f.write(updated_ontology_content)
+
+        global onto
+        onto = get_ontology(ONTOLOGY_PATH).load(reload=True) # Reload the ontology
+    except Exception as error:
+        print(error)
+        return False
+    
+    return True
 
 
 

@@ -1,0 +1,26 @@
+    <owl:NamedIndividual rdf:about="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#{kpi_id}">
+        <rdf:type rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#CustomKPI"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#assembly_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#assembly_machine_2"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#assembly_machine_3"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#large_cutting_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#large_cutting_machine_2"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#laser_cutter"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#laser_welding_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#laser_welding_machine_2"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#low_cutting_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#medium_cutting_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#medium_cutting_machine_2"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#medium_cutting_machine_3"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#riveting_machine"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#testing_machine_1"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#testing_machine_2"/>
+        <sa-ontology:isProducedBy rdf:resource="http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#testing_machine_3"/>
+        <sa-ontology:atomic rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">{kpi_atomic}</sa-ontology:atomic>
+        <sa-ontology:atomic_formula>{kpi_atomic_formula}</sa-ontology:atomic_formula>
+        <sa-ontology:description>{kpi_description}</sa-ontology:description>
+        <sa-ontology:forecastable rdf:datatype="http://www.w3.org/2001/XMLSchema#boolean">{kpi_forecastable}</sa-ontology:forecastable>
+        <sa-ontology:formula>{kpi_formula}</sa-ontology:formula>
+        <sa-ontology:id>{kpi_id}</sa-ontology:id>
+        <sa-ontology:unit_measure>{kpi_unit_measure}</sa-ontology:unit_measure>
+    </owl:NamedIndividual>

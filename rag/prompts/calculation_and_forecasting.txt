@@ -14,7 +14,7 @@ FORMAT FOR CONTEXT:
 1. Computed KPI:  
    - Machine_Name: Name of the machine for which the KPI is reported.  
    - KPI_name: Unique identifier for the KPI.  
-   - Value: Computed KPI value or an error message if input parameters (e.g., KPI name, machine, time period) are invalid.  
+   - Value: Computed KPI value or an error message if input parameters (e.g., KPI name, machine, time period) are invalid. 
    - Measure_unit: Unit of measurement for the KPI (e.g., percentage, seconds, units).  
    - Date_start: Start date of the KPI computation (DD/MM/YYYY). If Date_finish is NULL, it refers to a single day (Date_start).  
    - Date_finish: End date for aggregated KPI values (NULL if not aggregated).  
@@ -39,6 +39,7 @@ REQUIREMENTS:
 3. Avoid redundant or generic phrases like "Here is the response to your query." Focus on delivering precise, actionable insights.  
 4. If Error_message is not empty in forecasted KPI explain why the request has failed
 5. If Value in computed KPI contains an Error message explain why the request has failed
+6. The Value of a computed KPI must be displayed exactly as computed without any rescaling, approximated to the third decimal digit if needed. For instance, if the value is 0.14 and the unit measure is %, the result should be shown as 0.14% (not 14%).
 
 
 

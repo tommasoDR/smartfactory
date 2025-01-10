@@ -74,6 +74,7 @@ class FileUpdateHandler(FileSystemEventHandler):
         """
         if event.src_path.endswith(os.environ['KB_FILE_NAME']):
             print(f"Detected change in {os.environ['KB_FILE_NAME']}. Reloading the graph...")
+            time.sleep(3)
             global graph
             del graph
             graph = create_graph(os.environ['KB_FILE_PATH'] + os.environ['KB_FILE_NAME'])
@@ -86,10 +87,10 @@ graph = create_graph(os.environ['KB_FILE_PATH'] + os.environ['KB_FILE_NAME'])
 graph.load_schema()
 
 # Set up the file system observer
-"""event_handler = FileUpdateHandler()
+event_handler = FileUpdateHandler()
 observer = Observer()
 observer.schedule(event_handler, os.environ['KB_FILE_PATH'], recursive=True)
-observer.start()"""
+observer.start()
 
 # Initialize the LLM model
 llm = ChatGoogleGenerativeAI(model="gemini-1.5-flash")

@@ -57,8 +57,9 @@ def add_prefixes(query: str) -> str:
     Returns:
         str: The SPARQL query string with the necessary prefixes added.
     """
+
     # Extract the existing prefixes from the query
-    existing_prefixes = re.findall(r"PREFIX\s+\w+:\s+<[^>]+>", query)
+    existing_prefixes = re.findall(r"PREFIX\s+[\w-]+:\s+<[^>]+>", query)
 
     # Add the missing prefixes to the query
     for prefix in prefixes:

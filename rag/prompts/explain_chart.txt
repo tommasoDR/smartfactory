@@ -25,4 +25,6 @@ Output content:
    - Highlight significant values, anomalies, or changes over time (if applicable).  
    - Suggest what these insights might mean for the audience or decision-makers (if reasonable).
 
-Output format instruction: Output plain text, going on next line by inserting a newline character when necessary. If you use bullet points to organize information, starting each point with the character '-' followed by a space before the phrase. Highlight titles and machine names by embedding them in double asterisks (e.g., **General Explanation:**)
+Instructions: The value inside the Data field are already computed considering the KPI Measurement Unit. If the value is 0.10 and the KPI Measurement Unit is %, it means that the KPI has a value of 0.10%, not of 10%. The value of a KPI must be considered exactly as computed without any rescaling, approximated to the third decimal digit if needed 
+
+Output format instructions: Output plain text, going on next line by inserting a newline character when necessary. If you use bullet points to organize information, starting each point with the character '-' followed by a space before the phrase. Highlight titles and machine names by embedding them in double asterisks (e.g., **General Explanation:**)

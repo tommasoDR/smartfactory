@@ -80,6 +80,7 @@ interface DataViewProps {
 const DataView: React.FC<DataViewProps> = ({agentRequest, currentRequest}) => {
     const dataManager = PersistentDataManager.getInstance();
     const [kpi, setKpi] = useState<KPI>(dataManager.getKpiList()[0]);
+    const [displayedKpi, setDisplayedKpi] = useState<KPI | null>(kpi);
     const [timeFrame, setTimeFrame] = useState<TimeFrame>({
         from: new Date(2024, 2, 2),
         to: new Date(2024, 9, 19),
@@ -102,6 +103,7 @@ const DataView: React.FC<DataViewProps> = ({agentRequest, currentRequest}) => {
             if (kpi && timeFrame && graphType && DataManager.getInstance().getMachineList()) {
                 const data = await fetchData(kpi, timeFrame, usedChartType, filters);
                 setChartData(data);
+                setDisplayedKpi(kpi);
             }
         } catch (e) {
         } finally {
@@ -145,7 +147,7 @@ const DataView: React.FC<DataViewProps> = ({agentRequest, currentRequest}) => {
             />
 
             {/* Chart Section */}
-
+            
             {loading ? (
                 <p>Loading...</p>
             ) : (
@@ -154,7 +156,7 @@ const DataView: React.FC<DataViewProps> = ({agentRequest, currentRequest}) => {
                     <div className="flex justify-between items-center mb-6">
                         {chartData?.length > 0 && (
                             <h3 className="text-xl font-semibold text-gray-700 flex-1 text-center">
-                                {kpi?.name}
+                                {displayedKpi?.name}
                             </h3>
                         )}
                         {chartData?.length > 0 && (    
