@@ -64,6 +64,13 @@ export class Machine {
     }
 }
 
+export interface KPI_info {
+    id: string;
+    description: string;
+    formula: string;
+    unit_measure: string;
+    atomic: boolean;
+}
 
 export class KPI {
     id: string; // internal id

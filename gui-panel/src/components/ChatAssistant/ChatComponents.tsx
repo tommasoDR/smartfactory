@@ -2,6 +2,8 @@ import React, {useState} from 'react';
 import classNames from 'classnames';
 import {Message} from "./ChatAssistant";
 import {handleDownload, handleView} from "../Reports/ReportArchive";
+import { addNewKPI } from '../../api/ApiService';
+import { KPI_info } from '../../api/DataStructures';
 
 export class XAISources {
     // base it off the explanation interface
@@ -69,12 +71,14 @@ interface ExtraDataProps {
         explanation?: XAISources[];
         dashboardData?: { target: string; metadata: any };
         report?: string;
+        kpi_data?: KPI_info;
     };
     onNavigate: (target: string, metadata: any) => void;
 }
 
 const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => {
     const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
     const toggleExplanation = () => setIsExplanationOpen((prev) => !prev);
 
@@ -84,6 +88,18 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
         if (source) setActiveSource(source);
     };
     const closeModal = () => setActiveSource(null);
+
+    const handleAddKPI = async (kpi_data: KPI_info|undefined) => {
+        if (!kpi_data) return;
+    
+        setIsButtonDisabled(true); // Disable the button after it's clicked
+    
+        try {
+            await addNewKPI(kpi_data); // Call your function to add KPI
+        } catch (error) {
+            console.error("Error adding KPI:", error);
+        }
+    };
 
     return (
         <div className="mt-2 space-y-2">
@@ -122,6 +138,21 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
                 </div>
             )
             }
+
+            {/* KPI Data Button */}
+            {extraData.kpi_data && (
+                <button
+                    onClick={() => handleAddKPI(extraData.kpi_data)}
+                    className={`inline-block px-4 py-2 text-white rounded-lg text-sm shadow-md focus:outline-none ${
+                        isButtonDisabled
+                            ? "bg-gray-300 opacity-70"
+                            : "bg-green-500 hover:bg-green-600"
+                    }`}
+                    disabled={isButtonDisabled} // Disable the button if used
+                >
+                    {isButtonDisabled ? "Added" : "Add KPI"}
+                </button>
+            )}
 
             {/* Explanation Button */}
             {extraData.explanation && extraData.explanation.length > 0 && (

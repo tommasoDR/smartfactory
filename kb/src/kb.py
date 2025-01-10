@@ -441,6 +441,8 @@ def is_valid(kpi_info):
     formula = kpi_info['atomic_formula'][0]
 
     for kpi in onto.KPI.instances():
+        if formula != '-' and is_equal(kpi.id[0], formula):
+            return False
         if kpi.formula[0] != '-' and formula != '-':
             if is_equal(kpi.atomic_formula[0], formula):
                 return False
@@ -506,6 +508,8 @@ def add_kpi(kpi_info):
             if atomic_formula is None:
                 print("Atomic formula not found")
                 return False
+            
+            print(kpi_info)
 
             # Check if the KPI is valid
             if not is_valid(kpi_info):
@@ -601,8 +605,43 @@ class KPI_Info(BaseModel):
     description: str
     formula: str
     unit_measure: str
-    #forecastable: bool
     atomic: bool
+
+@app.post("/kb/validateKPI")
+async def validate_kpi_endpoint(kpi_info: KPI_Info, api_key: str = Depends(get_verify_api_key(["api-layer"]))):
+    """
+    Validate a KPI
+    
+    Args:
+        kpi_info (KPI_Info): The information of the KPI to validate.
+        
+    Returns:
+        dict: The status of the validation.
+    """
+    
+    kpi_info_dict = {
+        "id": [kpi_info.id],
+        "description": [kpi_info.description],
+        "formula": [kpi_info.formula],
+        "unit_measure": [kpi_info.unit_measure],
+        "forecastable": [False],
+        "atomic": [kpi_info.atomic],
+    }
+
+    # Compute and add the atomic formula
+    atomic_formula = reduce_formula(kpi_info_dict["formula"][0])
+    kpi_info_dict["atomic_formula"] = [atomic_formula]
+
+    # Check if the atomic formula is valid
+    if atomic_formula is None:
+        return {"Status": -1, "message": "KPI not valid"}
+
+    # Check if the KPI is valid
+    if not is_valid(kpi_info_dict):
+        return {"Status": -1, "message": "KPI not valid"}
+    
+    return {"Status": 0, "message": "KPI valid"}
+
 
 @app.post("/kb/insert")
 async def add_kpi_endpoint(kpi_info: KPI_Info, api_key: str = Depends(get_verify_api_key(["api-layer"]))): # to add or modify the services allowed to access the API, add or remove them from the list in the get_verify_api_key function

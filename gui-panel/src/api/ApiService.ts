@@ -1,6 +1,7 @@
 import axios from 'axios';
 
-import {DashboardFolder, ForecastDataEx, KPI, Machine, Schedule} from './DataStructures';
+import {DashboardFolder, ForecastDataEx, KPI, KPI_info, Machine, Schedule} from './DataStructures';
+import DataManager from './DataManager';
 
 const BASE_URL = '/api'; // API URL
 //const BASE_URL = 'http://0.0.0.0:10040'; // API URL
@@ -486,6 +487,25 @@ export const interactWithAgent = async (userId: string, userInput: string, reque
         throw new Error(error.response?.data?.message || 'Failed to interact with agent');
     }
 };
+
+
+export const addNewKPI = async (kpi: KPI_info): Promise<void> => {
+
+    // Ask KB to add the KPI
+    await axios.post(
+        `${BASE_URL}/smartfactory/kpi`,
+        kpi,
+        {
+            headers: {
+                "Content-Type": "application/json",
+                "x-api-key": API_KEY,
+            },
+        }
+    );
+
+    // Refresh the KPIs after adding a new one
+    DataManager.getInstance().refreshKPI();
+}
 
 /**
  * API GET used to get the KPI list

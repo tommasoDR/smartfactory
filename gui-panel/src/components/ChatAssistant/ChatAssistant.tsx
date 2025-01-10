@@ -3,7 +3,8 @@ import {useNavigate} from 'react-router-dom';
 import {interactWithAgent} from '../../api/ApiService';
 import ChatInput from './ChatInput';
 import MessageBubble, {XAISources} from "./ChatComponents";
-import DataManager from "../../api/DataManager";
+import { KPI_info } from '../../api/DataStructures';
+import { json } from 'stream/consumers';
 
 export interface Message {
     id: number;
@@ -13,6 +14,7 @@ export interface Message {
         explanation?: XAISources[];
         dashboardData?: { target: string; metadata: any };
         report?: string;
+        kpi_data?: KPI_info;
     };
 }
 
@@ -29,7 +31,47 @@ const handleText = (text: string) => {
     // replace **test** with <strong>test</strong> tags
     text = text.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
     return text;
-};
+}
+
+const handleNewKPI = (textReponse: string, data:string): [string, boolean, KPI_info|undefined] => {
+    
+    // Parse the data of the generated KPI
+    let generatedKPI = JSON.parse(data);
+
+    if (!generatedKPI.is_valid && 'error' in generatedKPI) {
+        return [generatedKPI.error, false, undefined];
+    }
+
+    // Extract the sources from textResponse
+    const referenceRegex = /\[(\d+)\]/g;
+    let sources = Array.from(new Set(textReponse.match(referenceRegex)));
+    // Create a response with the data of the generated KPI
+    
+    let response = 'The KPI <strong>' + generatedKPI.id + '</strong> has been generated:<br><br>';
+    response += '- <b>Description:</b> ' + generatedKPI.description + '<br>';
+    response += '- <b>Formula:</b> ' + generatedKPI.formula + '<br>';
+    response += '- <b>Unit measure:</b> ' + generatedKPI.unit_measure + '<br>';
+    response += '- <b>Atomic:</b> ' + generatedKPI.atomic + '<br><br>';
+    // Add the sources at the end of the response
+    if (sources) {
+        response += 'Sources: ';
+        response += sources.join(' ') + '<br><br>';
+    }
+
+    // Check if KPI has an error
+    if (generatedKPI.is_valid) {
+        response += 'The KPI has been successfully generated and is valid. Do you want to add it to the KPIs list?';
+    } else {
+        response += 'The KPI has been generated but is not valid. It has not been added to the KB.';
+    }
+
+    // Remove the field 'is_valid' from the generated KPI
+    let is_valid = generatedKPI.is_valid;
+    delete generatedKPI.is_valid;
+    
+    return [response, is_valid, generatedKPI];
+}
+
 
 const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetRequest, externalRequest}) => {
     const [isChatOpen, setIsChatOpen] = useState(false);
@@ -277,10 +319,22 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
                             response.textResponse = 'The report ' + response.textResponse + ' is ready for review.';
                             break;
                         case 'new_kpi':
-                            DataManager.getInstance().refreshKPI();
-                            extraData = {
-                                explanation: explanation,
-                            };
+                            let isValid: boolean;
+                            let kpi: KPI_info|undefined;
+                            [response.textResponse, isValid, kpi] = handleNewKPI(response.textResponse, response.data as string);
+                            
+                            if (isValid) {
+                                // Information to let the user decide whether to add the KPI to the list
+                                extraData = {
+                                    explanation: explanation,
+                                    kpi_data: kpi,
+                                };
+                            }
+                            else{
+                                extraData = {
+                                    explanation: explanation,
+                                };
+                            }
                             break;
                         case 'explainChart':
                             response.textResponse = handleText(response.textResponse);

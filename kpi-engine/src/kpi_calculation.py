@@ -524,6 +524,7 @@ class kpi_engine:
             print(aggregator)
         else:
             formula = response.get("atomic_formula")
+            aggregator = '-'
         unit_of_measure = response.get("unit_measure")
 
         try:

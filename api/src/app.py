@@ -29,7 +29,7 @@ from database.minio_connection import *
 from model.agent import Answer, Question, AgentRequest
 from model.alert import Alert
 from model.historical import HistoricalQueryParams
-from model.kpi import Kpi
+from model.kpi import Kpi, Kpi_info
 from model.kpi_calculate_request import KpiRequest
 from model.prediction import Json_in, Json_out
 from model.report import ReportResponse, Report, ScheduledReport
@@ -809,9 +809,42 @@ def get_machines(_: str = Depends(get_verify_api_key(["gui"]))):
     response = requests.get(url, headers=headers)
     return JSONResponse(content=response.json(), status_code=200)
 
+def validate_kpi(kpi: str) -> str:
+    """
+    Ask the knowledge base to validate the KPI.
+    
+    Args:
+        kpi (str): The KPI to validate.
+    Returns:
+        bool: True if the KPI is valid, False otherwise.
+    """
+    KB_HOST = os.getenv("KB_HOST", "localhost")
+    KB_PORT = os.getenv("KB_PORT", "8000")
+    url = f"http://{KB_HOST}:{KB_PORT}/kb/validateKPI"
+
+    api_key = os.getenv("API_KEY")
+    headers = {
+        'Content-Type': 'application/json',
+        'x-api-key': api_key
+    }
+
+    logging.info("Validating KPI: %s", kpi)
+
+    try:
+        kpi = json.loads(kpi)
+    except json.JSONDecodeError:
+        kpi = {"is_valid": False, "error": "An invalid JSON has been generated."}
+        return json.dumps(kpi)
+
+    response = requests.post(url, json=kpi, headers=headers)
+
+    kpi["is_valid"] = response.json()["Status"] == 0
+
+    return json.dumps(kpi)
+
 
 @app.post("/smartfactory/kpi", status_code=status.HTTP_200_OK)
-def insert_kpi(kpi: Kpi, _: str = Depends(get_verify_api_key(["gui"]))):
+def insert_kpi(kpi: Kpi_info, _: str = Depends(get_verify_api_key(["gui"]))):
     """
     Inserts a KPI (Key Performance Indicator) into the knowledge base.
 
@@ -838,13 +871,13 @@ def insert_kpi(kpi: Kpi, _: str = Depends(get_verify_api_key(["gui"]))):
 
     logging.info("Inserting KPI: %s", kpi)
 
-    # Convert from string to dict
-    kpi = json.loads(kpi)
+    kpi_dict = kpi.to_dict()
 
-    response = requests.post(url, json=kpi, headers=headers)
+    response = requests.post(url, json=kpi_dict, headers=headers)
     response_data = response.json()
+
     if response_data['Status'] == 0:
-        return JSONResponse(content=kpi["id"], status_code=200)
+        return JSONResponse(content=kpi_dict["id"], status_code=200)
     else:
         return JSONResponse(content=response_data, status_code=400)
 
@@ -913,7 +946,8 @@ def ai_agent_interaction(userId: str, agent_request: AgentRequest,
         if answer["label"] == 'new_kpi':
             # add new kpi
             try:
-                insert_kpi(answer["data"], os.getenv("API_KEY"))
+                answer["data"] = validate_kpi(answer["data"])
+                #insert_kpi(answer["data"], os.getenv("API_KEY"))
             except Exception as e:
                 logging.error("Exception: %s", str(e))
                 raise HTTPException(status_code=500, detail=str(e))
