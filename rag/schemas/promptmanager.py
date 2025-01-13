@@ -38,6 +38,7 @@ class PromptManager:
             "dashboard": "dashboard_generation",
             "translate": "translate",
             "get_language": "get_language",
+            "qa_preprocess": "qa_preprocess",
             "qa_select": "qa_select",
             "qa_answer": "qa_answer",
             "explain_chart": "explain_chart"

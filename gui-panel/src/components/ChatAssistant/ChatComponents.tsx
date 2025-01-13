@@ -78,7 +78,6 @@ interface ExtraDataProps {
 
 const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => {
     const [isExplanationOpen, setIsExplanationOpen] = useState(false);
-    const [isButtonDisabled, setIsButtonDisabled] = useState(false);
 
     const toggleExplanation = () => setIsExplanationOpen((prev) => !prev);
 
@@ -91,8 +90,6 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
 
     const handleAddKPI = async (kpi_data: KPI_info|undefined) => {
         if (!kpi_data) return;
-    
-        setIsButtonDisabled(true); // Disable the button after it's clicked
     
         try {
             await addNewKPI(kpi_data); // Call your function to add KPI
@@ -142,15 +139,20 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
             {/* KPI Data Button */}
             {extraData.kpi_data && (
                 <button
-                    onClick={() => handleAddKPI(extraData.kpi_data)}
+                    onClick={() => {
+                            handleAddKPI(extraData.kpi_data);
+                            // Disable the button after adding the KPI
+                            (extraData.kpi_data as KPI_info).id  = 'Added' 
+                        }
+                    }
                     className={`inline-block px-4 py-2 text-white rounded-lg text-sm shadow-md focus:outline-none ${
-                        isButtonDisabled
+                        extraData.kpi_data.id == "Added"
                             ? "bg-gray-300 opacity-70"
                             : "bg-green-500 hover:bg-green-600"
                     }`}
-                    disabled={isButtonDisabled} // Disable the button if used
+                    disabled={extraData.kpi_data.id == "Added"} // Disable the button if used
                 >
-                    {isButtonDisabled ? "Added" : "Add KPI"}
+                    {extraData.kpi_data.id ? "Added" : "Add KPI"}
                 </button>
             )}
 

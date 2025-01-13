@@ -1,0 +1,33 @@
+Task:  
+Analyze the user query in the context of the conversation history and the provided normal forms for KPIs and machines. Perform the following steps:  
+
+1. Identify References: Determine if the query explicitly refers to a KPI or machine or indirectly references one from the conversation history.  
+   - If the query refers to neither a KPI nor a machine, make no replacements.  
+   - If it refers to a KPI or machine in the provided list, replace it with the corresponding normal between quotation mark as "normal_form".  
+   - If it references a KPI or machine indirectly through conversation history, interpret the reference and replace it with the correct normal form.
+   
+2. Handle Conversation History Context: 
+   - If the query depends on the conversation history (e.g., Which is its ...), resolve the reference using the context before making replacements.  
+   - If you resolve the reference using the conversation history, reformulate the query to maintain its purpose while ensuring it is semantically correct (e.g. Which is its formula -> Which is the formula of ..., What is the description -> What is the description of ..., Is it atomic -> Is ... atomic).
+
+3. Handle Ambiguity: 
+   - If the query contains a string that matches multiple normal forms, choose the normal form that is syntactically most similar to the original string in the query.
+   - If the query refer to a KPI without an aggregator, use avg as the default aggregator.
+   - If the query refer to a machine without specifying the number and there are multiple machine with that normal form, use 1 as default number.
+
+4. Return the Processed Query: 
+   - Output the query with all applicable KPI and machine terms replaced by their normal forms. If no changes are necessary, return the query as-is.  
+   - Never try to answer to the questions in the query. Only process the query following the task instructions.
+
+Input Parameters:  
+- Query: {query}
+
+- Conversation History: 
+{history_context} 
+
+- KPI Normal Forms: {kpi_normal} 
+
+- Machine Normal Forms: {machines_normal} 
+
+Output:  
+Do not include any explanations or apologies in your responses. Do not include any text except the processed query with appropriate KPI and machine references resolved and replaced by their normal forms.

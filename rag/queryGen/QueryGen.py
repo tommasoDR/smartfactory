@@ -117,19 +117,27 @@ class QueryGenerator:
         # demo TODAY
         self.TODAY = datetime(year= 2024,month=10,day=19)
         kpi_query= """
-        PREFIX ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
-        SELECT ?id WHERE {
-        ?kpi rdf:type ?type.
-        FILTER (?type IN (ontology:ProductionKPI_Production, ontology:EnergyKPI_Consumption, ontology:EnergyKPI_Cost, ontology:MachineUsageKPI, ontology:ProductionKPI_Quality, ontology:CustomKPI)).
-        ?kpi ontology:id ?id .
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX sa-ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
+        
+        SELECT DISTINCT ?id
+        WHERE {
+            ?kpi sa-ontology:id ?id .
+            ?kpi sa-ontology:atomic ?atomic .
         }
         """
         machine_query="""
-        PREFIX ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
-        SELECT ?id WHERE {
-        ?machine rdf:type ?type
-        FILTER (?type IN (ontology:AssemblyMachine, ontology:LargeCapacityCuttingMachine, ontology:LaserCutter, ontology:LaserWeldingMachine, ontology:LowCapacityCuttingMachine, ontology:MediumCapacityCuttingMachine, ontology:RivetingMachine, ontology:TestingMachine)).
-        ?machine ontology:id ?id.
+        PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+        PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#>
+        PREFIX owl: <http://www.w3.org/2002/07/owl#>
+        PREFIX sa-ontology: <http://www.semanticweb.org/raffi/ontologies/2024/10/sa-ontology#>
+        
+        SELECT DISTINCT ?id
+        WHERE {
+            ?machine sa-ontology:id ?id .
+            ?machine sa-ontology:producesKPI ?kpi .
         }
         """
         graph = Graph()
