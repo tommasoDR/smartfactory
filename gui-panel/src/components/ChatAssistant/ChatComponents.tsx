@@ -152,7 +152,7 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
                     }`}
                     disabled={extraData.kpi_data.id == "Added"} // Disable the button if used
                 >
-                    {extraData.kpi_data.id ? "Added" : "Add KPI"}
+                    {extraData.kpi_data.id == "Added" ? "Added" : "Add KPI"}
                 </button>
             )}
 
