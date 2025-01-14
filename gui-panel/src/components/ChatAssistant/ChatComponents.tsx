@@ -93,7 +93,7 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
         if (!kpi_data) return;
     
         try {
-            await addNewKPI(kpi_data); // Call your function to add KPI
+            await addNewKPI(kpi_data); // Add the KPI
         } catch (error) {
             console.error("Error adding KPI:", error);
         }
