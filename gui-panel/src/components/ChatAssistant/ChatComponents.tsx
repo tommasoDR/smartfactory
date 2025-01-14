@@ -78,6 +78,7 @@ interface ExtraDataProps {
 
 const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => {
     const [isExplanationOpen, setIsExplanationOpen] = useState(false);
+    const [updateTrigger, setUpdateTrigger] = useState(false); // State to force re-render
 
     const toggleExplanation = () => setIsExplanationOpen((prev) => !prev);
 
@@ -143,6 +144,8 @@ const ExtraDataButtons: React.FC<ExtraDataProps> = ({extraData, onNavigate}) => 
                             handleAddKPI(extraData.kpi_data);
                             // Disable the button after adding the KPI
                             (extraData.kpi_data as KPI_info).id  = 'Added' 
+                            // Toggle the trigger to force a re-render
+                            setUpdateTrigger((prev) => !prev);
                         }
                     }
                     className={`inline-block px-4 py-2 text-white rounded-lg text-sm shadow-md focus:outline-none ${

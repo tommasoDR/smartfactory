@@ -127,7 +127,7 @@ const ChatAssistant: React.FC<ChatAssistantProps> = ({username, userId, resetReq
 
     var isDragging:boolean = false;
     const [initialized, setInitialized] = useState<boolean>(false);
-    const [position, setPosition] = useState({ x: 0, y: 0 });
+    const [position, setPosition] = useState({ x: 1016, y: 95 });
     
     var isResizing:boolean = false;
     const [size, setSize] = useState({ width: 500, height: 600 });
